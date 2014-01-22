@@ -1,1 +1,4 @@
 name: abjad
+
+dependencies:
+  unittest: any
