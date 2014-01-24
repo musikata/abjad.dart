@@ -4,8 +4,9 @@ import 'package:abjad/math.dart' as mathLib;
 import 'package:abjad/selection.dart' as selectionLib;
 import 'package:abjad/timespan.dart' as timespanLib;
 import 'package:abjad/spanner' as spannerLib;
-import 'package:abjad/utilities.dart' show attach, set_, deatch, iterate, mutate, override;
-import 'abjad.abc.AjadOject' show AbjadObject;
+import 'package:abjad/utils/utilities.dart' show attach, set_, deatch, iterate, mutate, override;
+import 'package:abjad/abc/AjadOject' show AbjadObject;
+import 'package:abjad/utils/copy' as copy;
 
 
 class Component extends AbjadObject{
@@ -64,6 +65,14 @@ class Component extends AbjadObject{
     **/
     return _copy_with_indicators_but_without_children_or_spanners();
   }
+  
+  __getnewargs__(){
+    /**
+    * Gets new arguments.
+    * Returns list.
+    **/
+    return [];
+  }
 
   operator *(n){
       /**
@@ -75,14 +84,14 @@ class Component extends AbjadObject{
       for (component in iterate(result).by_class()){
         detach(spannerLib.Spanner, component);
       }
-      if (result is Component){
+      if (result is this.runtimeType){
         result = [result];
       }
       else {
         result = list(result);
       }
       result = selectionLib.Selection(result);
-      return result
+      return result;
   }
 
   _cache_named_children() {
@@ -101,21 +110,21 @@ class Component extends AbjadObject{
     return name_dictionary;
   }
 
+  _copy_with_children_and_indicators_but_without_spanners(){
+    return _copy_with_indicators_but_without_children_or_spanners();
+  }
+
+  _copy_with_indicators_but_without_children_or_spanners(){
+    //@TODO: figure out how to translate python splat.
+    var cpy = new this.runtimeType(*this.__getnewargs__());
+    for (var indicator in _get_indicators()){
+      var new_indicator = copy.copy(indicator);
+      attach(new_indicator, cpy);
+    }
+    return cp;
+  }
+
   /*
-    def _copy_with_children_and_indicators_but_without_spanners(self):
-        return self._copy_with_indicators_but_without_children_or_spanners()
-
-    def _copy_with_indicators_but_without_children_or_spanners(self):
-        new = type(self)(*self.__getnewargs__())
-        if getattr(self, '_lilypond_grob_name_manager', None) is not None:
-            new._lilypond_grob_name_manager = copy.copy(override(self))
-        if getattr(self, '_lilypond_setting_name_manager', None) is not None:
-            new._lilypond_setting_name_manager = copy.copy(set_(self))
-        for indicator in self._get_indicators():
-            new_indicator = copy.copy(indicator)
-            attach(new_indicator, new)
-        return new
-
     def _detach_grace_containers(self, kind=None):
         from abjad.tools import scoretools
         grace_containers = self._get_grace_containers(kind=kind)
