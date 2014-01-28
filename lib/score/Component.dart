@@ -124,14 +124,15 @@ class Component extends AbjadObject{
     return cp;
   }
 
-  /*
-    def _detach_grace_containers(self, kind=None):
-        from abjad.tools import scoretools
-        grace_containers = self._get_grace_containers(kind=kind)
-        for grace_container in grace_containers:
-            detach(grace_container, self)
-        return grace_containers
+  _detach_grace_containers({kind: null}){
+    var grace_containers = _get_grace_containers(kind: kind);
+    for (var grace_container in grace_containers){
+      detach(grace_container, this);
+    }
+    return grace_containers;
+  }
 
+  /*
     def _detach_spanners(self, prototype=None):
         spanners = self._get_spanners(prototype=prototype)
         for spanner in spanners:
